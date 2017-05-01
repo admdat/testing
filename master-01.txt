@@ -1,7 +1,7 @@
 My name thanhdat
 I want to test multi user working with one file
 How to GIT track it
-=======
 say hello with everyone 
 My name is Minh Le
->>>>>>> 7af5baac1f01edd4c9ecda1835938d4c5a321ab9
+add new line
+Minh Le user
