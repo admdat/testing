@@ -1,0 +1,3 @@
+My name thanhdat
+I want to test multi user working with one file
+How to GIT track it
