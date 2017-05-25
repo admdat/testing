@@ -7,3 +7,5 @@ Toi da them vao dong nay day
 Ong hay duoi viec toi di Hehe
 IF i see someone break this rule
 He have to leave his job.
+them vao noi dung o day
+hay dung lenh git merge de get cap nhat ve local
