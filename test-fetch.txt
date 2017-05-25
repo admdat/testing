@@ -5,3 +5,6 @@ Khong ai duoc phep them xoa sua trong bai viet nay
 Toi da dung version control to track it
 IF i see someone break this rule
 He have to leave his job.
+Toi nghi ngo ai do da them vao doan van nay
+Toi dang tim kiem nguoi nay
+
