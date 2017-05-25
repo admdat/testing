@@ -1,5 +1,7 @@
-<<<<<<< HEAD
 edit on local repository
-=======
 edit by web github
->>>>>>> refs/remotes/origin/master
+Noi dung cua doan dien van can phai chinh xac
+Khong ai duoc phep them xoa sua trong bai viet nay
+Toi da dung version control to track it
+IF i see someone break this rule
+He have to leave his job.
