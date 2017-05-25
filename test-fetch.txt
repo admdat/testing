@@ -3,8 +3,6 @@ edit by web github
 Noi dung cua doan dien van can phai chinh xac
 Khong ai duoc phep them xoa sua trong bai viet nay
 Toi da dung version control to track it
-Toi da them vao dong nay day
-Ong hay duoi viec toi di Hehe
 IF i see someone break this rule
 He have to leave his job.
 Toi nghi ngo ai do da them vao doan van nay
