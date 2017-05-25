@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 edit on local repository
+=======
+edit by web github
+>>>>>>> refs/remotes/origin/master
