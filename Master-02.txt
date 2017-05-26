@@ -1,6 +1,0 @@
-
-insert by thanhdat9990
-on master branch
-insert by minhle
-Ok I fix confict file and now I want to commit to remote repos
-
