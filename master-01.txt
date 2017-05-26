@@ -1,9 +1,0 @@
-My name thanhdat
-I want to test multi user working with one file
-How to GIT track it
-say hello with everyone 
-My name is Minh Le
-add new line
-Minh Le user
-insert after thanhdat9990 commit
-
