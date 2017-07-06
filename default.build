@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<project name="Workflow Tool" default="all" xmlns="http://nant.sf.net/release/0.91-rc1/nant.xsd">
+  <property name="solution.buildConfiguration" value="Debug" overwrite="false" />
+
+  <property name="solution.name" value="WorkflowTool"/>
+  <property name="solution.version" value="2.0.34"/>
+  <property name="solution.company" value="ASWIG Solutions"/>
+  <property name="solution.copyright" value="Copyright © ASWIG Solutions 2013"/>
+  <property name="solution.WFT.ClassLibrary.project.folder" value="WftClassLibrary"/>
+  <property name="solution.WFT.ClassLibrarySetup.project.name" value="WFT.ClassLibrarySetup"/>
+  <property name="solution.WFT.ClassLibrarySetup.project.folder" value="WftClassLibrarySetup"/>
+  <property name="solution.WFT.SPCommons.project.name" value="WFT.SPCommons"/>
+  <property name="solution.WFT.SPCommons.project.folder" value="WftSPCommons"/>
+  <property name="solution.WFT.SPWorkflows.InsurerDecision.project.name" value="WFT.SPWorkflows.InsurerDecision"/>
+  <property name="solution.WFT.SPWorkflows.InsurerDecision.project.folder" value="WftSPCores"/>
+  <property name="solution.WFT.SPWorkflows.InternalReview.project" value="WFT.SPWorkflows.InternalReview"/>
+  <property name="solution.WFT.SPWorkflows.ExternalReview.project" value="WFT.SPWorkflows.ExternalReview"/>
+  <property name="solution.WFT.SPTimerJobs.project.name" value="WFT.SPTimerJobs"/>
+  <property name="solution.WFT.SPTimerJobs.project.folder" value="WftSPTimerJobs"/>
+
+  <property name="DeploymentPackages.directory.name" value="DeploymentPackages"/>
+  <property name="DeploymentPackages.directory.path" value="${path::get-full-path(DeploymentPackages.directory.name)}"/>
+
+  <property name="BuildTime.filename" value="build_time"/>
+  <tstamp property="build.time" pattern="yyyyMMdd-HHmm" />
+
+  <property name="DeploymentScripts.directory.name" value="DeploymentScripts"/>
+  <property name="DeploymentScripts.directory.path" value="${path::get-full-path('Data\'+DeploymentScripts.directory.name)}"/>
+
+  <readregistry property="VisualStudio.InstallDir" key="SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\InstallDir" />
+
+  <!-- a dummy test target -->
+  <target name="info">
+    <echo message="${project::get-name()} is located at: ${project::get-base-directory() }"/>
+    <echo message="Solution file: ${solution.name}.sln"/>
+    <echo message="Visual Studio IDE directory: ${VisualStudio.InstallDir}" />
+  </target>
+
+  <target name="clean">
+    <delete dir="${solution.WFT.ClassLibrary.project.folder}/bin" failonerror="true" />
+    <delete dir="${solution.WFT.ClassLibrary.project.folder}/obj" failonerror="true" />
+
+    <delete dir="${solution.WFT.ClassLibrarySetup.project.folder}/Debug" failonerror="true" />
+    <delete dir="${solution.WFT.ClassLibrarySetup.project.folder}/Release" failonerror="true" />
+
+    <delete dir="${solution.WFT.SPCommons.project.folder}/bin" failonerror="true" />
+    <delete dir="${solution.WFT.SPCommons.project.folder}/obj" failonerror="true" />
+
+    <delete dir="${solution.WFT.SPWorkflows.InsurerDecision.project.folder}/bin" failonerror="true" />
+    <delete dir="${solution.WFT.SPWorkflows.InsurerDecision.project.folder}/obj" failonerror="true" />
+
+    <delete dir="${solution.WFT.SPWorkflows.InternalReview.project}/bin" failonerror="true" />
+    <delete dir="${solution.WFT.SPWorkflows.InternalReview.project}/obj" failonerror="true" />
+
+    <delete dir="${solution.WFT.SPWorkflows.ExternalReview.project}/bin" failonerror="true" />
+    <delete dir="${solution.WFT.SPWorkflows.ExternalReview.project}/obj" failonerror="true" />
+
+    <delete dir="${solution.WFT.SPTimerJobs.project.folder}/bin" failonerror="true" />
+    <delete dir="${solution.WFT.SPTimerJobs.project.folder}/obj" failonerror="true" />
+
+    <delete dir="${DeploymentPackages.directory.name}" failonerror="true" />
+  </target>
+
+  <target name="set.version" description="generates the version number">
+    <echo message="Setting the build version to ${solution.version}..." />
+    <attrib file="GlobalAssemblyInfo.cs" readonly="false" />
+    <asminfo output="GlobalAssemblyInfo.cs" language="CSharp">
+      <imports>
+        <import namespace="System" />
+        <import namespace="System.Reflection" />
+      </imports>
+      <attributes>
+        <attribute type="AssemblyCompanyAttribute" value="${solution.company}" />
+        <attribute type="AssemblyCopyrightAttribute" value="${solution.copyright}" />
+        <attribute type="AssemblyFileVersionAttribute" value="${solution.version}" />
+        <attribute type="AssemblyInformationalVersionAttribute" value="${solution.version}.${build.time}" />
+      </attributes>
+    </asminfo>
+    <attrib file="GlobalAssemblyInfo.cs" readonly="true" />
+  </target>
+
+  <target name="build" depends="clean">
+    <!-- build solution using msbuild-->
+	<exec program="${framework::get-tool-path('msbuild.exe')}" managed="strict" />
+    <msbuild target="build" project="${solution.name}.sln">
+      <property name="configuration" value="${solution.buildConfiguration}"/>
+    </msbuild>
+    <!-- build setup project using Visual Studio -->
+    <exec program="devenv.exe" basedir="${VisualStudio.InstallDir}" workingdir="." verbose="true"
+          commandline="${solution.name}.sln /build ${solution.buildConfiguration} /project ${solution.WFT.ClassLibrarySetup.project.name}"/>
+  </target>
+
+  <target name="package">
+    <!-- delete deployment package directory -->
+    <delete dir="${DeploymentPackages.directory.path}"/>
+
+    <!-- copy deployment scripts to deployment folder -->
+    <copy todir="${DeploymentPackages.directory.path}">
+      <fileset basedir="${DeploymentScripts.directory.path}">
+        <include name="./**"/>
+      </fileset>
+    </copy>
+
+    <!-- package SharePoint project into WSP files -->
+    <msbuild target="package" project="${solution.WFT.SPCommons.project.folder}/${solution.WFT.SPCommons.project.name}.csproj">
+      <property name="configuration" value="${solution.buildConfiguration}"/>
+      <property name="outputpath" value="${DeploymentPackages.directory.path}\wsp"/>
+    </msbuild>
+    <msbuild target="package" project="${solution.WFT.SPWorkflows.InsurerDecision.project.folder}/${solution.WFT.SPWorkflows.InsurerDecision.project.name}.csproj">
+      <property name="configuration" value="${solution.buildConfiguration}"/>
+      <property name="outputpath" value="${DeploymentPackages.directory.path}\wsp"/>
+    </msbuild>
+    <msbuild target="package" project="${solution.WFT.SPWorkflows.InternalReview.project}/${solution.WFT.SPWorkflows.InternalReview.project}.csproj">
+      <property name="configuration" value="${solution.buildConfiguration}"/>
+      <property name="outputpath" value="${DeploymentPackages.directory.path}\wsp"/>
+    </msbuild>
+    <msbuild target="package" project="${solution.WFT.SPWorkflows.ExternalReview.project}/${solution.WFT.SPWorkflows.ExternalReview.project}.csproj">
+      <property name="configuration" value="${solution.buildConfiguration}"/>
+      <property name="outputpath" value="${DeploymentPackages.directory.path}\wsp"/>
+    </msbuild>
+    <msbuild target="package" project="${solution.WFT.SPTimerJobs.project.folder}/${solution.WFT.SPTimerJobs.project.name}.csproj">
+      <property name="configuration" value="${solution.buildConfiguration}"/>
+      <property name="outputpath" value="${DeploymentPackages.directory.path}\wsp"/>
+    </msbuild>
+
+    <!-- copy WftClassLibrary setup files to deployment folder -->
+    <copy todir="${DeploymentPackages.directory.path}">
+      <fileset basedir="${solution.WFT.ClassLibrarySetup.project.folder}\${solution.buildConfiguration}\">
+        <include name="*.msi"/>
+      </fileset>
+    </copy>
+	
+    <!-- cleanup wsp folder -->
+    <delete>
+      <fileset basedir="${DeploymentPackages.directory.path}\wsp">
+        <include name="*.dll"/>
+        <include name="*.pdb"/>
+        <include name="*.config"/>
+      </fileset>
+    </delete>
+
+    <!-- create buildtime file -->
+    <echo file="${DeploymentPackages.directory.path}\${BuildTime.filename}">${datetime::now()}</echo>
+  </target>
+
+  <target name="deploy-local">
+    <exec program="powershell" workingdir="${DeploymentPackages.directory.path}" verbose="true"
+          commandline="-noprofile -nologo -noninteractive -command .\deploy.ps1">
+    </exec>
+  </target>
+
+  <target name="all" depends="clean, set.version, build, package">
+  </target>
+</project>
